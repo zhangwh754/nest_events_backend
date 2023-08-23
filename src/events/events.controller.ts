@@ -1,55 +1,50 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common'
+import { Repository } from 'typeorm'
+import { InjectRepository } from '@nestjs/typeorm'
+
 import { CreateEventsDto, UpdateEventsDto } from './dto/events.dto'
-import { Events } from './entity/events.enetity'
+import { Events } from './entity/events.entity'
 
 @Controller('/events')
 export class EventsController {
-  private events: Events[] = []
+  constructor(@InjectRepository(Events) private readonly events: Repository<Events>) {}
 
   @Get()
-  findAll() {
-    return this.events
+  async findAll() {
+    return await this.events.find()
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    const item = this.events.find(item => item.id === parseInt(id))
-
-    return item || {}
+  async findOne(@Param('id') id: string) {
+    return await this.events.findOneBy({ id: parseInt(id) })
   }
 
   @Post()
-  create(@Body() createEventsDto: CreateEventsDto) {
-    const event = {
+  async create(@Body() createEventsDto: CreateEventsDto) {
+    return await this.events.save({
       ...createEventsDto,
-      when: new Date(createEventsDto.when),
-      id: this.events.length + 1
-    }
-
-    this.events.push(event)
-
-    return event
+      when: new Date(createEventsDto.when)
+    })
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEventsDto: UpdateEventsDto) {
-    const eventIndex = this.events.findIndex(item => item.id === parseInt(id))
+  async update(@Param('id') id: string, @Body() updateEventsDto: UpdateEventsDto) {
+    const event = new Events()
 
-    this.events[eventIndex]
+    event.name = updateEventsDto.name
+    event.description = updateEventsDto.description
+    event.address = updateEventsDto.address
+    if (updateEventsDto.when) event.when = new Date(updateEventsDto.when)
 
-    this.events[eventIndex] = {
-      ...this.events[eventIndex],
-      ...updateEventsDto,
-      when: updateEventsDto.when ? new Date(updateEventsDto.when) : new Date(this.events[eventIndex].when)
-    }
+    await this.events.update(id, event)
 
-    return this.events[eventIndex]
+    return '更新成功'
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    this.events.filter(item => item.id !== parseInt(id))
+  async remove(@Param('id') id: string) {
+    await this.events.delete(id)
 
-    return `删除${id}成功`
+    return '删除成功'
   }
 }
