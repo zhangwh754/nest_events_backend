@@ -1,5 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import { Inject, Injectable, Logger } from '@nestjs/common'
 
 @Injectable()
 export class AppChineseService {
@@ -8,13 +7,12 @@ export class AppChineseService {
     private readonly appName: string,
     @Inject('MESSAGE')
     private readonly message: string,
-    private configService: ConfigService
+    private readonly logger: Logger
   ) {}
 
   getHello(): string {
-    const result = this.configService.get('orm.config')
-
-    debugger
+    this.logger.debug('hello world debugger')
+    this.logger.warn('hello world warn')
 
     const msg = `你好世界 from ${this.appName} | ${this.message}`
 

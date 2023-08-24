@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { Module, Logger } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConfigModule } from '@nestjs/config'
 
@@ -29,6 +29,7 @@ class AppDummy {
   ],
   controllers: [AppController],
   providers: [
+    Logger,
     {
       provide: AppService,
       useClass: isChinese ? AppChineseService : AppService
