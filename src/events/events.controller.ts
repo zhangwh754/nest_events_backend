@@ -11,7 +11,7 @@ export class EventsController {
 
   @Get()
   async findAll() {
-    return await this.events.find()
+    return await this.events.find({ relations: ['attendees'] })
   }
 
   @Get(':id')
@@ -23,7 +23,7 @@ export class EventsController {
   async create(@Body() createEventsDto: CreateEventsDto) {
     return await this.events.save({
       ...createEventsDto,
-      when: new Date(createEventsDto.when)
+      when: new Date(createEventsDto.when),
     })
   }
 

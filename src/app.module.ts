@@ -6,7 +6,8 @@ import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { EventsModule } from './events/events.module'
 import { AppChineseService } from './app.chinese.service'
-import { ormConfig, ormConfigProd } from './config'
+import { ormConfig, ormConfigProd } from './app/config'
+import { AttendeeModule } from './attendee/attendee.module'
 
 const isChinese = true
 
@@ -20,30 +21,31 @@ class AppDummy {
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [ormConfig, ormConfigProd]
+      load: [ormConfig, ormConfigProd],
     }),
     TypeOrmModule.forRootAsync({
-      useFactory: ormConfig
+      useFactory: ormConfig,
     }),
-    EventsModule
+    EventsModule,
+    AttendeeModule,
   ],
   controllers: [AppController],
   providers: [
     Logger,
     {
       provide: AppService,
-      useClass: isChinese ? AppChineseService : AppService
+      useClass: isChinese ? AppChineseService : AppService,
     },
     {
       provide: 'APP_NAME',
-      useValue: 'Nest Events Backend'
+      useValue: 'Nest Events Backend',
     },
     AppDummy,
     {
       provide: 'MESSAGE',
       inject: [AppDummy],
-      useFactory: app => app.getDummy()
-    }
-  ]
+      useFactory: app => app.getDummy(),
+    },
+  ],
 })
 export class AppModule {}
