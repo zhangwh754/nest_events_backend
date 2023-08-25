@@ -21,6 +21,10 @@ export class EventsService {
     return this.eventsRepository.createQueryBuilder('events').orderBy('events.id', 'DESC')
   }
 
+  async findTotal() {
+    return this.eventsRepository.count()
+  }
+
   async findById(id: number) {
     try {
       // return this.eventsRepository.findOne({ where: { id: id } })

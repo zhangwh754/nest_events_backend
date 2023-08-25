@@ -16,7 +16,14 @@ export class EventsController {
   @Get()
   async findAll(@Query() queryEventsDto: QueryEventsDto) {
     // return await this.events.find({ relations: ['attendees'] })
-    return await this.eventsService.findPage(queryEventsDto)
+    const data = await this.eventsService.findPage(queryEventsDto)
+    const total = await this.eventsService.findTotal()
+    return {
+      pageNum: queryEventsDto.pageNum,
+      pageSize: queryEventsDto.pageSize,
+      totalNum: total,
+      data,
+    }
   }
 
   @Get(':id')

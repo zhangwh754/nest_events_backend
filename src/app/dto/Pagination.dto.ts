@@ -8,5 +8,5 @@ export class PaginationDto {
 
   @IsOptional()
   @IsNumber({}, numberConfig)
-  pageSize?: number
+  pageSize?: number = 10
 }
