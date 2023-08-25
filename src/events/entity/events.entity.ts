@@ -21,4 +21,10 @@ export class Events {
 
   @OneToMany(() => Attendee, attendee => attendee.event)
   attendees: Attendee[]
+
+  attendeeCount?: number
+
+  attendeeAccepted?: number
+  attendeeMaybe?: number
+  attendeeRejected?: number
 }
