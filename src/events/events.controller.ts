@@ -1,29 +1,41 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common'
 import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 
-import { CreateEventsDto, UpdateEventsDto } from './dto/events.dto'
+import { CreateEventsDto, QueryEventsDto, UpdateEventsDto } from './dto/events.dto'
 import { Events } from './entity/events.entity'
+import { EventsService } from './events.service'
 
 @Controller('/events')
 export class EventsController {
-  constructor(@InjectRepository(Events) private readonly events: Repository<Events>) {}
+  constructor(
+    @InjectRepository(Events) private readonly events: Repository<Events>,
+    private readonly eventsService: EventsService
+  ) {}
 
   @Get()
-  async findAll() {
-    return await this.events.find()
+  async findAll(@Query() queryEventsDto: QueryEventsDto) {
+    // return await this.events.find({ relations: ['attendees'] })
+    const data = await this.eventsService.findPage(queryEventsDto)
+    const total = await this.eventsService.findTotal()
+    return {
+      pageNum: queryEventsDto.pageNum,
+      pageSize: queryEventsDto.pageSize,
+      totalNum: total,
+      data,
+    }
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return await this.events.findOneBy({ id: parseInt(id) })
+  async findOne(@Param('id') id: number) {
+    return await this.eventsService.findById(id)
   }
 
   @Post()
   async create(@Body() createEventsDto: CreateEventsDto) {
     return await this.events.save({
       ...createEventsDto,
-      when: new Date(createEventsDto.when)
+      when: new Date(createEventsDto.when),
     })
   }
 

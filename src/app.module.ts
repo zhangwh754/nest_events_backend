@@ -1,11 +1,14 @@
-import { Module } from '@nestjs/common'
+import { Module, Logger } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { ConfigModule } from '@nestjs/config'
 
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
-import { Events } from './events/entity/events.entity'
 import { EventsModule } from './events/events.module'
 import { AppChineseService } from './app.chinese.service'
+import { ormConfig, ormConfigProd } from './app/config'
+import { AttendeeModule } from './attendee/attendee.module'
+import { SchoolModule } from './school/school.module'
 
 const isChinese = true
 
@@ -17,34 +20,34 @@ class AppDummy {
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: '127.0.0.1',
-      port: 3307,
-      username: 'root',
-      password: '123456',
-      database: 'nest_events',
-      entities: [Events],
-      synchronize: true
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [ormConfig, ormConfigProd],
     }),
-    EventsModule
+    TypeOrmModule.forRootAsync({
+      useFactory: ormConfig,
+    }),
+    EventsModule,
+    AttendeeModule,
+    SchoolModule,
   ],
   controllers: [AppController],
   providers: [
+    Logger,
     {
       provide: AppService,
-      useClass: isChinese ? AppChineseService : AppService
+      useClass: isChinese ? AppChineseService : AppService,
     },
     {
       provide: 'APP_NAME',
-      useValue: 'Nest Events Backend'
+      useValue: 'Nest Events Backend',
     },
     AppDummy,
     {
       provide: 'MESSAGE',
       inject: [AppDummy],
-      useFactory: app => app.getDummy()
-    }
-  ]
+      useFactory: app => app.getDummy(),
+    },
+  ],
 })
 export class AppModule {}
