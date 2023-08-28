@@ -3,6 +3,7 @@ import { BookService } from './book.service'
 import { PaginationDto } from '@/app/dto'
 import { CreateBookDto } from './dto/create-book.dto'
 import { UpdateBookDto } from './dto/update-book.dto'
+import { AddBookTagsDto } from './dto/add-book-tags.dto'
 
 @Controller('/book')
 export class BookController {
@@ -21,6 +22,11 @@ export class BookController {
   @Post()
   async create(@Body() createBookDto: CreateBookDto) {
     return await this.bookService.create(createBookDto)
+  }
+
+  @Post(':bookId')
+  async addTag(@Param('bookId') bookId: number, @Body() addBookTagsDto: AddBookTagsDto) {
+    return await this.bookService.addTag(bookId, addBookTagsDto.ids)
   }
 
   @Delete(':id')

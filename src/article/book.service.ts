@@ -21,10 +21,10 @@ export class BookService {
   /**
    * @description: 全部分页
    */
-  public findAll(paginationDto: PaginationDto) {
-    const query = this.getBookQuery()
+  public async findAll(paginationDto: PaginationDto) {
+    const query = this.getBookQuery().leftJoinAndSelect('book.tags', 'tag')
 
-    return paginate(query, paginationDto)
+    return paginate(query, paginationDto, { alias: 'book' })
   }
 
   /**
@@ -46,8 +46,31 @@ export class BookService {
       if (await this.findOneByName(createBookDto.name)) {
         throw new HttpException(`name:${createBookDto.name}已存在`, 400)
       }
+      // const {
+      //   raw: { insertId },
+      // } =
       await this.getBookQuery().insert().into(Book).values(createBookDto).execute()
+
       return '创建成功'
+    } catch (error) {
+      throw error
+    }
+  }
+
+  /**
+   * @description: 新增标签
+   */
+  public async addTag(bookId: number, tagIds: number[]) {
+    try {
+      const existingIds = await this.tagRepository
+        .createQueryBuilder('tag')
+        .where('id IN (:...tagIds)', { tagIds })
+        .getCount()
+
+      if (tagIds.length !== existingIds) throw new HttpException('部分id不存在', 400)
+
+      await this.getBookQuery().relation(Book, 'tags').of(bookId).add(tagIds)
+      return '新增标签成功'
     } catch (error) {
       throw error
     }

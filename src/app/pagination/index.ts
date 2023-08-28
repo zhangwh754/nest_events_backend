@@ -5,21 +5,32 @@ export interface Pagination {
   pageSize?: number
 }
 
+interface Options {
+  alias?: string
+}
+
 /**
  * @description: 传入Query Builder，返回分页结果
  * @param {SelectQueryBuilder} qb
- * @param {Pagination} options pageNum必传
+ * @param {Pagination} paginationOption pageNum必传
+ * @param {Options} options 配置
  */
-export async function paginate<T>(qb: SelectQueryBuilder<T>, options: Pagination) {
-  const offset = options.pageSize * (options.pageNum - 1)
+export async function paginate<T>(
+  qb: SelectQueryBuilder<T>,
+  paginationOption: Pagination,
+  options: Options = { alias: '' }
+) {
+  const offset = paginationOption.pageSize * (paginationOption.pageNum - 1)
 
-  const data = await qb.take(options.pageSize).offset(offset).orderBy('id', 'DESC').getMany()
+  const orderByKey = options.alias ? `${options.alias}.id` : 'id'
+
+  const data = await qb.take(paginationOption.pageSize).offset(offset).orderBy(orderByKey, 'DESC').getMany()
 
   const total = await qb.getCount()
 
   return {
-    pageNum: options.pageNum,
-    pageSize: options.pageSize,
+    pageNum: paginationOption.pageNum,
+    pageSize: paginationOption.pageSize,
     total,
     data,
   }

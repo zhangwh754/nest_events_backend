@@ -1,4 +1,4 @@
-import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, RelationOptions } from 'typeorm'
 import { Teacher } from './teacher.entity'
 
 @Entity()
