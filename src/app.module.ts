@@ -9,6 +9,7 @@ import { AppChineseService } from './app.chinese.service'
 import { ormConfig, ormConfigProd } from './app/config'
 import { AttendeeModule } from './attendee/attendee.module'
 import { SchoolModule } from './school/school.module'
+import { ArticleModule } from './article/article.module'
 
 const isChinese = true
 
@@ -30,6 +31,7 @@ class AppDummy {
     EventsModule,
     AttendeeModule,
     SchoolModule,
+    ArticleModule,
   ],
   controllers: [AppController],
   providers: [
