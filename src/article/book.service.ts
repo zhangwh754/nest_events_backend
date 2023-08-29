@@ -1,6 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { DataSource, Repository } from 'typeorm'
 
 import { Book } from './entity/book.entity'
 import { PaginationDto } from '@/app/dto'
@@ -84,6 +84,28 @@ export class BookService {
       const res = await this.getBookQuery().delete().from(Book).where(`id = :id`, { id }).execute()
       if (res.affected != 0) return '删除成功'
       throw new HttpException(`id:${id}不存在`, 400)
+    } catch (error) {
+      throw error
+    }
+  }
+
+  /**
+   * @description: 事务测试
+   */
+  public async updateTest(id: number, updateBookDto: UpdateBookDto) {
+    const price = updateBookDto.price
+    const price1 = updateBookDto.price + 1
+    const price2 = updateBookDto.price + 2
+
+    try {
+      await this.bookRepository.manager.transaction(async manager => {
+        await manager.createQueryBuilder().update(Book).set({ price: price }).where(`id = :id`, { id }).execute()
+        await manager.createQueryBuilder().update(Book).set({ price: price1 }).where(`id = :id`, { id }).execute()
+        // if (true) throw new HttpException('UNEXPECTED ERROR', 500)
+        await manager.createQueryBuilder().update(Book).set({ price: price2 }).where(`id = :id`, { id }).execute()
+      })
+
+      return '更新成功'
     } catch (error) {
       throw error
     }
