@@ -10,6 +10,8 @@ import { ormConfig, ormConfigProd } from './app/config'
 import { AttendeeModule } from './attendee/attendee.module'
 import { SchoolModule } from './school/school.module'
 import { ArticleModule } from './article/article.module'
+import { UserModule } from './user/user.module'
+import { AuthModule } from './auth/auth.module'
 
 const isChinese = true
 
@@ -32,6 +34,8 @@ class AppDummy {
     AttendeeModule,
     SchoolModule,
     ArticleModule,
+    UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [
