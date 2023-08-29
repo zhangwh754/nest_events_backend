@@ -24,7 +24,7 @@ export async function paginate<T>(
 
   const orderByKey = options.alias ? `${options.alias}.id` : 'id'
 
-  const data = await qb.take(paginationOption.pageSize).offset(offset).orderBy(orderByKey, 'DESC').getMany()
+  const data = await qb.take(paginationOption.pageSize).skip(offset).orderBy(orderByKey, 'DESC').getMany()
 
   const total = await qb.getCount()
 
