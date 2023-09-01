@@ -3,8 +3,12 @@ import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 
 import { CreateEventsDto, QueryEventsDto, UpdateEventsDto } from './dto/events.dto'
-import { Events } from './entity/events.entity'
+import { Events } from './events.entity'
 import { EventsService } from './events.service'
+import { CurrentUser } from '@/app/decorator'
+import { User } from '@/user/user.entity'
+import { Auth } from '@/auth/auth.decorator'
+import { Role } from '@/auth/role.enum'
 
 @Controller('/events')
 export class EventsController {
@@ -15,15 +19,7 @@ export class EventsController {
 
   @Get()
   async findAll(@Query() queryEventsDto: QueryEventsDto) {
-    // return await this.events.find({ relations: ['attendees'] })
-    const data = await this.eventsService.findPage(queryEventsDto)
-    const total = await this.eventsService.findTotal()
-    return {
-      pageNum: queryEventsDto.pageNum,
-      pageSize: queryEventsDto.pageSize,
-      totalNum: total,
-      data,
-    }
+    return await this.eventsService.findPage(queryEventsDto)
   }
 
   @Get(':id')
@@ -31,8 +27,11 @@ export class EventsController {
     return await this.eventsService.findById(id)
   }
 
+  @Auth(Role.User)
   @Post()
-  async create(@Body() createEventsDto: CreateEventsDto) {
+  async create(@CurrentUser() currentUser: User, @Body() createEventsDto: CreateEventsDto) {
+    return this.eventsService.create(currentUser, createEventsDto)
+
     return await this.events.save({
       ...createEventsDto,
       when: new Date(createEventsDto.when),

@@ -1,5 +1,6 @@
 import { Role } from '@/auth/role.enum'
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { Events } from '@/events/events.entity'
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity()
 export class User {
@@ -30,4 +31,7 @@ export class User {
     default: Role.User,
   })
   identity: Role
+
+  @OneToMany(() => Events, events => events.organizer)
+  organized: Events[]
 }
