@@ -9,6 +9,7 @@ import { SchoolModule } from './school/school.module'
 import { ArticleModule } from './article/article.module'
 import { UserModule } from './user/user.module'
 import { AuthModule } from './auth/auth.module'
+import { JwtAuthGuard } from './auth/jwt-auth.guard'
 
 @Module({
   imports: [
@@ -27,6 +28,12 @@ import { AuthModule } from './auth/auth.module'
     AuthModule,
   ],
   controllers: [],
-  providers: [Logger],
+  providers: [
+    Logger,
+    {
+      provide: 'APP_GUARD',
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

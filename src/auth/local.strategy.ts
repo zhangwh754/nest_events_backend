@@ -17,7 +17,10 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   public async validate(username: string, password: string): Promise<any> {
-    const user = await this.userRepository.findOne({ where: { username } })
+    const user = await this.userRepository.findOne({
+      where: { username },
+      select: ['email', 'identity', 'password', 'sex', 'userId', 'username'],
+    })
 
     if (!user) {
       this.logger.debug(`用户:${username}不存在`)
@@ -32,7 +35,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: _password, ...userData } = user
 
-    this.logger.log(`${username}登录成功`)
+    this.logger.log(`用户：${username}登录成功`)
 
     return userData
   }
