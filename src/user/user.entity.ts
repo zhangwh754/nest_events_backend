@@ -36,6 +36,6 @@ export class User {
   @OneToMany(() => Events, events => events.organizer)
   organized: Events[]
 
-  // @OneToMany(() => Events, events => events.attended)
-  // attended: Events[]
+  @OneToMany(() => Attendee, attendee => attendee.user)
+  attended: Attendee[]
 }

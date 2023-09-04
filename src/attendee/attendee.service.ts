@@ -32,7 +32,8 @@ export class AttendeeService {
       if (!event) throw new HttpException('event不存在', 400)
 
       const attendee = new Attendee()
-      attendee.name = currentUser.username
+      // attendee.name = currentUser.username
+      attendee.user = currentUser
       attendee.event = event
       attendee.answer = answer
 

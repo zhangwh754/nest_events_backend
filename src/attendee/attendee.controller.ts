@@ -26,7 +26,7 @@ export class AttendeeController {
   }
 
   @Auth(Role.User)
-  @Patch('id')
+  @Patch(':id')
   async update(@CurrentUser() currentUser: User, @Param('id') id: number, @Body() attendeeDto: AttendeeDto) {
     return await this.attendeeService.update(currentUser, id, attendeeDto.answer)
   }
