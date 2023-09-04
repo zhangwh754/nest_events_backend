@@ -87,7 +87,7 @@ export class EventsService {
 
       if (!event) throw new HttpException('events不存在', 404)
 
-      if (event.organizerId !== currentUser.userId) throw new ForbiddenException()
+      if (event.organizerId !== currentUser.userId) throw new ForbiddenException(null, '仅创建者可以修改')
 
       const eventEntity = new Events()
 
