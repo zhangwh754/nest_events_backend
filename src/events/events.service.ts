@@ -1,12 +1,13 @@
-import { HttpException, Injectable, Logger } from '@nestjs/common'
+import { ForbiddenException, HttpException, Injectable, Logger } from '@nestjs/common'
+import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Events } from './events.entity'
-import { Repository } from 'typeorm'
 import { AttendeeAnswerEnum } from '@/attendee/attendee.entity'
 import { QueryEventsDto, QueryWhenDto } from './dto/query-events.dto'
 import { paginate } from '@/app/pagination'
 import { User } from '@/user/user.entity'
 import { CreateEventsDto } from './dto/create-events.dto'
+import { UpdateEventsDto } from './dto/update-events.dto'
 
 @Injectable()
 export class EventsService {
@@ -20,7 +21,7 @@ export class EventsService {
   /**
    * @description: 新建
    */
-  async create(currentUser: User, createEventsDto: CreateEventsDto) {
+  public async create(currentUser: User, createEventsDto: CreateEventsDto) {
     try {
       await this.getBaseQuery()
         .insert()
@@ -38,7 +39,7 @@ export class EventsService {
    * @description:根据id查询
    * @param {number} id
    */
-  async findById(id: number) {
+  public async findById(id: number) {
     try {
       const query = this.getRelationCountQuery().andWhere('id = :id', { id })
 
@@ -52,7 +53,7 @@ export class EventsService {
    * @description: 分页接口
    * @param {QueryEventsDto} queryEventsDto
    */
-  async findPage(queryEventsDto: QueryEventsDto) {
+  public async findPage(queryEventsDto: QueryEventsDto) {
     let query = this.getBaseQuery()
 
     switch (Number(queryEventsDto.when)) {
@@ -75,6 +76,32 @@ export class EventsService {
     }
 
     return paginate(query, queryEventsDto)
+  }
+
+  /**
+   * @description: 更新event信息（仅创建者可更新）
+   */
+  public async update(currentUser: User, id: number, updateEventsDto: UpdateEventsDto) {
+    try {
+      const event = await this.findById(id)
+
+      if (!event) throw new HttpException('events不存在', 404)
+
+      if (event.organizerId !== currentUser.userId) throw new ForbiddenException()
+
+      const eventEntity = new Events()
+
+      eventEntity.name = updateEventsDto.name
+      eventEntity.description = updateEventsDto.description
+      eventEntity.address = updateEventsDto.address
+      if (updateEventsDto.when) eventEntity.when = new Date(updateEventsDto.when)
+
+      await this.eventsRepository.update(id, eventEntity)
+
+      return '更新成功'
+    } catch (error) {
+      throw error
+    }
   }
 
   /**

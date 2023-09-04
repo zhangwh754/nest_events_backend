@@ -31,25 +31,12 @@ export class EventsController {
   @Post()
   async create(@CurrentUser() currentUser: User, @Body() createEventsDto: CreateEventsDto) {
     return this.eventsService.create(currentUser, createEventsDto)
-
-    return await this.events.save({
-      ...createEventsDto,
-      when: new Date(createEventsDto.when),
-    })
   }
 
+  @Auth(Role.User)
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateEventsDto: UpdateEventsDto) {
-    const event = new Events()
-
-    event.name = updateEventsDto.name
-    event.description = updateEventsDto.description
-    event.address = updateEventsDto.address
-    if (updateEventsDto.when) event.when = new Date(updateEventsDto.when)
-
-    await this.events.update(id, event)
-
-    return '更新成功'
+  async update(@CurrentUser() currentUser: User, @Param('id') id: number, @Body() updateEventsDto: UpdateEventsDto) {
+    return this.eventsService.update(currentUser, id, updateEventsDto)
   }
 
   @Delete(':id')
