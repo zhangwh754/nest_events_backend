@@ -105,6 +105,25 @@ export class EventsService {
   }
 
   /**
+   * @description: 移除event（仅创建者可移除）
+   */
+  public async remove(currentUser: User, id: number) {
+    try {
+      const event = await this.findById(id)
+
+      if (!event) throw new HttpException('events不存在', 404)
+
+      if (event.organizerId !== currentUser.userId) throw new ForbiddenException(null, '仅创建者可以移除')
+
+      await this.eventsRepository.delete(id)
+
+      return '删除成功'
+    } catch (error) {
+      throw error
+    }
+  }
+
+  /**
    * @description: 查询与会者人数、同意人数、待定人数、拒绝人数
    */
   private getRelationCountQuery() {

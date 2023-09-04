@@ -39,10 +39,9 @@ export class EventsController {
     return this.eventsService.update(currentUser, id, updateEventsDto)
   }
 
+  @Auth(Role.User)
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    await this.events.delete(id)
-
-    return '删除成功'
+  async remove(@CurrentUser() currentUser: User, @Param('id') id: number) {
+    return await this.eventsService.remove(currentUser, id)
   }
 }
