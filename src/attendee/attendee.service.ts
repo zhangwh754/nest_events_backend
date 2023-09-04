@@ -31,14 +31,22 @@ export class AttendeeService {
       const event = await this.eventsService.findById(eventId)
       if (!event) throw new HttpException('event不存在', 400)
 
-      const attendee = new Attendee()
-      // attendee.name = currentUser.username
+      if (event.organizerId === currentUser.userId) throw new HttpException('不能参加自己举办的会议', 400)
+
+      let attendee = await this.getBaseQuery()
+        .where('attendee.eventId = :eventId', { eventId: eventId })
+        .andWhere('attendee.userId = :userId', { userId: currentUser.userId })
+        .getOne()
+
+      if (attendee) throw new HttpException(`当前用户已参加本次会议`, 400)
+
+      attendee = new Attendee()
       attendee.user = currentUser
       attendee.event = event
       attendee.answer = answer
 
       await this.attendRepository.save(attendee)
-      return '创建成功'
+      return '参会成功'
     } catch (error) {
       throw error
     }
@@ -52,7 +60,7 @@ export class AttendeeService {
         .where('eventId = :eventId', { eventId: eventId })
         .execute()
 
-      return '更新成功'
+      return '更新参会期望成功'
     } catch (error) {
       throw error
     }
