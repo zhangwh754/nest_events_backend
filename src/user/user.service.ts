@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 
-import { User } from './user.entity'
+import { User, createUser } from './user.entity'
 import { Repository } from 'typeorm'
 import { CreateUserDto } from './dto/create-user.dto'
 import { AuthService } from '@/auth/auth.service'
@@ -25,7 +25,7 @@ export class UserService {
    */
   public async create(createUserDto: CreateUserDto) {
     try {
-      const user = new User()
+      const user = new createUser({})
 
       const existUser = await this.userRepository.findOne({
         where: [{ username: createUserDto.username }, { email: createUserDto.email }],
@@ -41,13 +41,12 @@ export class UserService {
       user.sex = createUserDto.sex
       user.identity = Role.User // 只允许创建普通用户
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...res } = await this.userRepository.save(user)
+      const res = await this.userRepository.save(user)
 
-      return {
+      return new createUser({
         ...res,
         token: this.authService.getTokenFromUser(user),
-      }
+      })
     } catch (error) {
       throw error
     }
