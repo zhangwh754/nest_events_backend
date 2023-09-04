@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 
-import { Attendee } from '@/attendee/entity/attendee.entity'
+import { Attendee } from '@/attendee/attendee.entity'
 import { User } from '@/user/user.entity'
 
 @Entity('events')

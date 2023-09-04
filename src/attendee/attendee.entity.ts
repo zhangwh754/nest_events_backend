@@ -23,5 +23,5 @@ export class Attendee {
     enum: AttendeeAnswerEnum,
     default: 1,
   })
-  answer: AttendeeAnswerEnum
+  answer: number
 }

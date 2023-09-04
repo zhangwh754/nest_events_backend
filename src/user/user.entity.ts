@@ -1,3 +1,4 @@
+import { Attendee } from '@/attendee/attendee.entity'
 import { Role } from '@/auth/role.enum'
 import { Events } from '@/events/events.entity'
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
@@ -34,4 +35,7 @@ export class User {
 
   @OneToMany(() => Events, events => events.organizer)
   organized: Events[]
+
+  // @OneToMany(() => Events, events => events.attended)
+  // attended: Events[]
 }

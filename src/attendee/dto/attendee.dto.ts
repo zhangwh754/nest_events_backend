@@ -1,4 +1,8 @@
-import { CreateAttendeeDto } from './create-attendee.dto'
-import { UpdateAttendeeDto } from './update-attendee.dto'
+import { IsEnum, IsOptional } from 'class-validator'
+import { AttendeeAnswerEnum } from '../attendee.entity'
 
-export { CreateAttendeeDto, UpdateAttendeeDto }
+export class AttendeeDto {
+  @IsEnum(AttendeeAnswerEnum)
+  @IsOptional()
+  answer: number
+}

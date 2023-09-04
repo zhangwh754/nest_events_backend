@@ -1,8 +1,12 @@
-import { Body, Controller, Get, Patch, Post, Query } from '@nestjs/common'
+import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common'
 
-import { CreateAttendeeDto, UpdateAttendeeDto } from './dto/attendee.dto'
 import { AttendeeService } from './attendee.service'
 import { PaginationDto } from '@/app/dto'
+import { CurrentUser } from '@/app/decorator'
+import { User } from '@/user/user.entity'
+import { Auth } from '@/auth/auth.decorator'
+import { Role } from '@/auth/role.enum'
+import { AttendeeDto } from './dto/attendee.dto'
 
 @Controller('attendee')
 export class AttendeeController {
@@ -15,13 +19,15 @@ export class AttendeeController {
     return await this.attendeeService.find(pageNum, pageSize)
   }
 
-  @Post()
-  async create(@Body() createAttendeeDto: CreateAttendeeDto) {
-    return await this.attendeeService.create(createAttendeeDto)
+  @Auth(Role.User)
+  @Post(':id')
+  async create(@CurrentUser() currentUser: User, @Param('id') id: number, @Body() attendeeDto: AttendeeDto) {
+    return await this.attendeeService.create(currentUser, id, attendeeDto.answer)
   }
 
-  @Patch()
-  async update(@Body() updateAttendeeDto: UpdateAttendeeDto) {
-    return updateAttendeeDto
+  @Auth(Role.User)
+  @Patch('id')
+  async update(@CurrentUser() currentUser: User, @Param('id') id: number, @Body() attendeeDto: AttendeeDto) {
+    return await this.attendeeService.update(currentUser, id, attendeeDto.answer)
   }
 }
