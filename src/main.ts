@@ -14,6 +14,8 @@ async function bootstrap() {
   app.useGlobalFilters(new ExceptionInterceptor())
   app.useGlobalInterceptors(new ResponseInterceptor())
 
+  app.enableCors()
+
   await app.listen(3000)
 }
 bootstrap()
