@@ -19,6 +19,8 @@ async function bootstrap() {
   app.useStaticAssets(resolve(process.cwd(), 'public/resource'), { prefix: '/file' })
   app.useStaticAssets(resolve(process.cwd(), 'public/static'), { prefix: '/demo' })
 
+  app.enableCors()
+
   await app.listen(3000)
 }
 bootstrap()
